@@ -42,23 +42,23 @@ unsigned char max30102_write_reg(unsigned char reg_addr,unsigned char data)
 void max30102_init(void)
 {
     //配置中断寄存器
-    max30102_write_reg(REG_INTR_ENABLE_1,0x80);     //A_FULL_EN=1,启用A_FULL中断；其他中断禁用
-    max30102_write_reg(REG_INTR_ENABLE_2,0x00);     //禁用内部温度就绪中断
+    max30102_write_reg(REG_INTR_ENABLE_1,CONFIG_INTR_ENABLE_1);
+    max30102_write_reg(REG_INTR_ENABLE_2,CONFIG_INTR_ENABLE_2);
     //将FIFO_WR_PTR、OVF_COUNTER、FIFO_RD_PTR寄存器全部清除为0
     max30102_write_reg(REG_FIFO_WR_PTR,0x00);
     max30102_write_reg(REG_OVF_COUNTER,0x00);
     max30102_write_reg(REG_FIFO_RD_PTR,0x00);
     //FIFO配置
-    max30102_write_reg(REG_FIFO_CONFIG,0x0f);       //0b0000 1111，SMP_AVE[2:0]=000，不进行样本平均；FIFO_ROLLOVER_EN=0，不启用FIFO满时回滚功能；FIFO_A_FULL[3:0]=0xfh，当FIFO中有17个未读样本时触发中断。
+    max30102_write_reg(REG_FIFO_CONFIG,CONFIG_FIFO);
     //Mode配置
-    max30102_write_reg(REG_MODE_CONFIG,0x03);       //0b0000 0011，启用SpO2模式。
+    max30102_write_reg(REG_MODE_CONFIG,CONFIG_MODE);
     //SpO2配置
-    max30102_write_reg(REG_SPO2_CONFIG,0x27);       //0b0010 0111， ADC满标度为4096nA, 每秒钟采集100个样本, ADC分辨率为18bits
+    max30102_write_reg(REG_SPO2_CONFIG,CONFIG_SPO2);
     //LED脉冲幅度
-    max30102_write_reg(REG_LED1_PA,0x32);           //LED1脉冲幅度置为10mA
-    max30102_write_reg(REG_LED2_PA,0x32);           //LED2脉冲幅度置为10mA
+    max30102_write_reg(REG_LED1_PA,CONFIG_LED1_PA);
+    max30102_write_reg(REG_LED2_PA,CONFIG_LED2_PA);
     //温度模块使能
-    max30102_write_reg(REG_TEMP_EN,0x01);
+    max30102_write_reg(REG_TEMP_EN,CONFIG_TEMP_EN);
     //GPIO模拟中断初始化
     hi_io_set_func(PIN_INT,HI_IO_FUNC_GPIO_8_GPIO);
     hi_gpio_set_dir(PIN_INT,HI_GPIO_DIR_IN);
@@ -144,6 +144,7 @@ unsigned char max30102_read_FIFO_DATA(FIFO_DATA sample_data[],unsigned char num_
 {
     unsigned char i,j;
 
+    //清除中断
     max30102_read_reg(REG_INTR_STATUS_1,&i);
     max30102_read_reg(REG_INTR_STATUS_2,&j);
 

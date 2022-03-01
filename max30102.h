@@ -11,6 +11,9 @@ typedef struct
     unsigned char IR[3];
 }FIFO_DATA;
 
+//每次FIFO_FULL中断触发时的未读样本数
+#define SAMPLES_PER_TIME 17
+
 //max30102的设备ID
 #define MAX30102_ADDR 0xAE
 
@@ -37,6 +40,19 @@ typedef struct
 #define REG_PROX_INT_THRESH 0x30
 #define REG_REV_ID 0xFE
 #define REG_PART_ID 0xFF
+
+//max30102的各寄存器配置参数
+#define CONFIG_INTR_ENABLE_1 0x80   //A_FULL_EN=1,启用A_FULL中断；其他中断禁用
+#define CONFIG_INTR_ENABLE_2 0x00   //禁用内部温度就绪中断
+#define CONFIG_FIFO 0x0f    //0b0000 1111，SMP_AVE[2:0]=000，不进行样本平均；FIFO_ROLLOVER_EN=0，不启用FIFO满时回滚功能；FIFO_A_FULL[3:0]=0xfh，当FIFO中有17个未读样本时触发中断。
+#define CONFIG_MODE 0x03    //0b0000 0011，启用SpO2模式。
+#define CONFIG_SPO2 0x27    //0b0010 0111， ADC满标度为4096nA, 每秒钟采集100个样本, ADC分辨率为18bits
+#define CONFIG_LED1_PA 0x32     //LED1脉冲幅度置为10mA
+#define CONFIG_LED2_PA 0x32     //LED2脉冲幅度置为10mA
+#define CONFIG_TEMP_EN 0x01     //启用测温功能
+
+
+
 
 //GPIO8 引脚监控max30102中断引脚
 #define PIN_INT HI_GPIO_IDX_8
